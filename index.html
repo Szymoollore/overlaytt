@@ -105,6 +105,18 @@
     white-space: nowrap;
   }
 
+  /* LITE mode (?lite=1): only a plain slide, no glow / shadow / pulse / fade.
+     Meant for renderers without GPU compositing (e.g. TikTok LIVE Studio). */
+  @keyframes slide-in-lite  { from { transform: translateX(calc(-100% - var(--margin-left) - 40px)); } to { transform: translateX(0); } }
+  @keyframes slide-out-lite { from { transform: translateX(0); } to { transform: translateX(calc(-100% - var(--margin-left) - 40px)); } }
+  body.lite .wrap { opacity: 1; will-change: transform; }
+  body.lite .wrap.in  { animation-name: slide-in-lite; }
+  body.lite .wrap.out { animation-name: slide-out-lite; }
+  body.lite .glow { display: none; }
+  body.lite .pill { box-shadow: none; }
+  body.lite .stage { will-change: auto; }
+  body.lite .stage.pulse { animation: none; }
+
   @media (prefers-reduced-motion: reduce) {
     .wrap.in, .wrap.out, .stage.pulse, .stage.pulse .glow { animation-duration: .01s; }
   }
@@ -186,6 +198,10 @@
   const stage = document.getElementById("stage");
   const nameEl = document.getElementById("name");
   wrap.style.scale = scale;
+  if (p.get("lite") === "1") document.body.classList.add("lite");
+  // optional margins in px, handy when the source is cropped small: ?ml=0&mb=0
+  if (p.has("ml")) document.documentElement.style.setProperty("--margin-left", parseFloat(p.get("ml")) + "px");
+  if (p.has("mb")) document.documentElement.style.setProperty("--margin-bottom", parseFloat(p.get("mb")) + "px");
 
   const SLIDE_IN = 700, PULSE = 600, SLIDE_OUT = 550; // ms, match the CSS
 
